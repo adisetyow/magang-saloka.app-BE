@@ -248,4 +248,22 @@ class Service_Checklist extends Controller
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
     }
+
+    public function startChecklist(ChecklistSchedule $schedule)
+    {
+        try {
+            $data = $this->checklistSubmissionController->startOrGetTodaySubmission($schedule);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Submission ready',
+                'data' => $data
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 422);
+        }
+    }
 }
