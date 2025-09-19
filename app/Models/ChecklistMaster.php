@@ -17,7 +17,7 @@ class ChecklistMaster extends Model
     protected $fillable = [
         'checklist_id',
         'name',
-        'type',
+        'checklist_type_id',
         'created_by',
     ];
 
@@ -32,6 +32,11 @@ class ChecklistMaster extends Model
             // Hapus semua jadwal yang terkait dengan master ini
             $checklistMaster->schedules()->delete();
         });
+    }
+
+    public function type(): BelongsTo
+    {
+        return $this->belongsTo(ChecklistType::class, 'checklist_type_id');
     }
 
     /**

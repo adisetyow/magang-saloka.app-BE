@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->string('checklist_id')->unique();
             $table->string('name');
-            $table->string('type');
+            $table->foreignId('checklist_type_id')->constrained('checklist_types');
             $table->foreignId('created_by')->constrained('users')->onDelete('restrict');
             $table->timestamps();
             $table->softDeletes(); // Untuk fitur soft delete

@@ -28,7 +28,7 @@ class ChecklistMasterController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'type' => 'required|string|max:255',
+            'checklist_type_id' => 'required|integer|exists:checklist_types,id',
             'id_karyawan' => 'required|string',
             'items' => 'required|array|min:1',
             'items.*.activity_name' => 'required|string|max:255',
@@ -65,7 +65,7 @@ class ChecklistMasterController extends Controller
             $master = ChecklistMaster::create([
                 'checklist_id' => 'CK-' . strtoupper(Str::random(8)),
                 'name' => $request->name,
-                'type' => $request->type,
+                'checklist_type_id' => $request->checklist_type_id,
                 'created_by' => $user->id,
             ]);
 
@@ -98,7 +98,7 @@ class ChecklistMasterController extends Controller
         // Validasi input
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|required|string|max:255',
-            'type' => 'sometimes|required|string|max:255',
+            'checklist_type_id' => 'sometimes|required|integer|exists:checklist_types,id',
             'items' => 'sometimes|required|array|min:1',
             // Validasi untuk setiap item di dalam array
             'items.*.id' => 'nullable|integer|exists:checklist_items,id',

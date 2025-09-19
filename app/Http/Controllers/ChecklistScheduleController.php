@@ -98,13 +98,13 @@ class ChecklistScheduleController extends Controller
         $today = Carbon::now();
 
         // Ambil semua jadwal aktif yang belum melewati tanggal akhirnya
-        $activeSchedules = ChecklistSchedule::with('master:id,name,type')
-            ->where(function ($query) use ($today) {
-                $query->whereNull('end_date')
+        $activeSchedules = ChecklistSchedule::with('master.type')
+        ->where(function ($query) use ($today) {
+            $query->whereNull('end_date')
                     ->orWhere('end_date', '>=', $today->toDateString());
-            })
-            ->whereHas('master') // Pastikan hanya jadwal yang masternya masih ada
-            ->get();
+        })
+        ->whereHas('master')
+        ->get();
 
         // Dari jadwal aktif, filter mana yang jatuh tempo hari ini
         $dueTodaySchedules = $activeSchedules->filter(function ($schedule) use ($today) {
@@ -115,7 +115,7 @@ class ChecklistScheduleController extends Controller
                     $dayName = strtolower($today->format('l'));
                     return in_array($dayName, $schedule->schedule_details ?? []);
                 case 'bulanan':
-                    return in_array($today->day, $schedule->schedule_details ?? []);
+                    return in_array($today->toDateString(), $schedule->schedule_details ?? []);
                 case 'tertentu':
                     return in_array($today->toDateString(), $schedule->schedule_details ?? []);
                 default:

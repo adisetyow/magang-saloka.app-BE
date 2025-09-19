@@ -9,7 +9,7 @@ use App\Http\Controllers\Service_Dashboard;
 use App\Http\Controllers\Service_SyncTransaction;
 use App\Http\Controllers\Ticket;
 use App\Http\Controllers\Service_Checklist;
-
+use App\Http\Controllers\ChecklistTypeController;
 
 
 /*
@@ -49,6 +49,9 @@ Route::controller(Service_Master::class)->group(function () {
     // Update Category
     Route::post('update_category', 'updateCategory');
 });
+
+Route::get('checklist-types', [ChecklistTypeController::class, 'index']);
+Route::post('checklist-types', [ChecklistTypeController::class, 'store']);
 
 Route::controller(Service_Checklist::class)->group(function () {
     Route::get('checklist-masters', 'getAllMasters');

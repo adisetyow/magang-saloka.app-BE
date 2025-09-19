@@ -92,9 +92,6 @@ class ChecklistSubmissionController extends Controller
      */
     public function startOrGetTodaySubmission(ChecklistSchedule $schedule)
     {
-        // ====================================================================
-        // --- KODE BARU YANG LEBIH AMAN ---
-        // ====================================================================
 
         // Langkah 1: Muat relasi master secara eksplisit.
         $schedule->load('master');
@@ -104,7 +101,7 @@ class ChecklistSubmissionController extends Controller
         if (!$schedule->master) {
             throw new Exception("Gagal memulai: Master Checklist untuk jadwal '{$schedule->schedule_name}' telah dihapus.");
         }
-
+        
         // Muat relasi items setelah kita yakin master-nya ada.
         $schedule->master->load('items');
 
@@ -136,9 +133,10 @@ class ChecklistSubmissionController extends Controller
                 ]);
             }
         }
-
+        
         return $submission;
     }
+    
 
 
     /**
