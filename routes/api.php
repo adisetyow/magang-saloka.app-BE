@@ -63,6 +63,7 @@ Route::controller(Service_Checklist::class)->group(function () {
     Route::put('checklist-schedules/{id}', 'updateSchedule');
     Route::delete('checklist-schedules/{id}', 'destroySchedule');
     Route::post('start-checklist/{schedule}', 'startChecklist');
+    Route::get('todays-checklists', 'getTodaysSchedules');
 
     Route::get('checklist-submissions', 'getDailySubmissions');
     Route::get('checklist-submissions/{submissionId}', 'getSubmissionDetail');

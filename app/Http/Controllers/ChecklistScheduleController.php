@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\ChecklistMaster;
 use App\Models\ChecklistSchedule;
+use App\Models\ChecklistSubmission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Carbon;
 
 class ChecklistScheduleController extends Controller
 {
@@ -91,10 +93,62 @@ class ChecklistScheduleController extends Controller
         return $schedule;
     }
 
+    public function getTodaysSchedules()
+    {
+        $today = Carbon::now();
+
+        // Ambil semua jadwal aktif yang belum melewati tanggal akhirnya
+        $activeSchedules = ChecklistSchedule::with('master:id,name,type')
+            ->where(function ($query) use ($today) {
+                $query->whereNull('end_date')
+                    ->orWhere('end_date', '>=', $today->toDateString());
+            })
+            ->whereHas('master') // Pastikan hanya jadwal yang masternya masih ada
+            ->get();
+
+        // Dari jadwal aktif, filter mana yang jatuh tempo hari ini
+        $dueTodaySchedules = $activeSchedules->filter(function ($schedule) use ($today) {
+            switch ($schedule->periode_type) {
+                case 'harian':
+                    return true;
+                case 'mingguan':
+                    $dayName = strtolower($today->format('l'));
+                    return in_array($dayName, $schedule->schedule_details ?? []);
+                case 'bulanan':
+                    return in_array($today->day, $schedule->schedule_details ?? []);
+                case 'tertentu':
+                    return in_array($today->toDateString(), $schedule->schedule_details ?? []);
+                default:
+                    return false;
+            }
+        });
+
+        // Ambil ID dari jadwal yang jatuh tempo hari ini
+        $dueTodayIds = $dueTodaySchedules->pluck('id');
+
+        // Ambil data submission HANYA untuk jadwal yang jatuh tempo hari ini
+        $todaySubmissions = ChecklistSubmission::whereIn('checklist_schedule_id', $dueTodayIds)
+            ->whereDate('submission_date', $today->toDateString())
+            ->get()
+            ->keyBy('checklist_schedule_id'); // Jadikan ID jadwal sebagai key untuk pencarian cepat
+
+        // Gabungkan data jadwal dengan status submissionnya
+        $result = $dueTodaySchedules->map(function ($schedule) use ($todaySubmissions) {
+            $submission = $todaySubmissions->get($schedule->id);
+
+            // Tambahkan properti baru 'today_submission' ke setiap jadwal
+            $schedule->setAttribute('today_submission', [
+                'status' => $submission ? $submission->status : 'pending',
+                'id' => $submission ? $submission->id : null,
+            ]);
+            return $schedule;
+        });
+
+        return $result->values(); // Kembalikan sebagai array biasa
+    }
 
     /**
      * Helper function untuk sinkronisasi user (menghindari duplikasi kode).
-     * Anda bisa memindahkan ini ke Class tersendiri nanti.
      */
     private function synchronizeUser($karyawanId)
     {

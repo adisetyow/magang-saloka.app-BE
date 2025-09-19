@@ -249,6 +249,21 @@ class Service_Checklist extends Controller
         }
     }
 
+    public function getTodaysSchedules()
+    {
+        try {
+            $data = $this->checklistScheduleController->getTodaysSchedules();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Today\'s schedules retrieved successfully',
+                'data' => $data
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+        }
+    }
+
+
     public function startChecklist(ChecklistSchedule $schedule)
     {
         try {

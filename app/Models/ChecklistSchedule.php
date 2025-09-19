@@ -12,6 +12,8 @@ class ChecklistSchedule extends Model
 
     protected $table = 'checklist_schedules';
 
+    protected $appends = ['today_submission'];
+
     protected $fillable = [
         'checklist_master_id',
         'schedule_name',
@@ -27,6 +29,11 @@ class ChecklistSchedule extends Model
     protected $casts = [
         'schedule_details' => 'array',
     ];
+
+    public function getTodaySubmissionAttribute()
+    {
+        return $this->attributes['today_submission'] ?? null;
+    }
 
     /**
      * Sebuah jadwal dimiliki oleh satu master checklist.

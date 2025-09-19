@@ -92,6 +92,10 @@ class ChecklistSubmissionController extends Controller
      */
     public function startOrGetTodaySubmission(ChecklistSchedule $schedule)
     {
+        // ====================================================================
+        // --- KODE BARU YANG LEBIH AMAN ---
+        // ====================================================================
+
         // Langkah 1: Muat relasi master secara eksplisit.
         $schedule->load('master');
 
@@ -123,6 +127,7 @@ class ChecklistSubmissionController extends Controller
         );
 
         if ($submission->wasRecentlyCreated) {
+            // Karena kita sudah memuat relasi di atas, loop ini sekarang dijamin aman.
             foreach ($schedule->master->items as $item) {
                 ChecklistSubmissionDetail::create([
                     'submission_id' => $submission->id,
@@ -134,6 +139,7 @@ class ChecklistSubmissionController extends Controller
 
         return $submission;
     }
+
 
     /**
      * Update status submission.
