@@ -18,7 +18,7 @@ class ChecklistMasterController extends Controller
     public function index()
     {
         // Mengambil semua master checklist beserta relasi 'items'-nya
-        return ChecklistMaster::with('items')->latest()->get();
+        return ChecklistMaster::with(['items', 'type'])->latest()->get();
     }
 
     /**
