@@ -99,12 +99,12 @@ class ChecklistScheduleController extends Controller
 
         // Ambil semua jadwal aktif yang belum melewati tanggal akhirnya
         $activeSchedules = ChecklistSchedule::with('master.type')
-        ->where(function ($query) use ($today) {
-            $query->whereNull('end_date')
+            ->where(function ($query) use ($today) {
+                $query->whereNull('end_date')
                     ->orWhere('end_date', '>=', $today->toDateString());
-        })
-        ->whereHas('master')
-        ->get();
+            })
+            ->whereHas('master')
+            ->get();
 
         // Dari jadwal aktif, filter mana yang jatuh tempo hari ini
         $dueTodaySchedules = $activeSchedules->filter(function ($schedule) use ($today) {
@@ -146,6 +146,7 @@ class ChecklistScheduleController extends Controller
 
         return $result->values(); // Kembalikan sebagai array biasa
     }
+
 
     /**
      * Helper function untuk sinkronisasi user (menghindari duplikasi kode).
